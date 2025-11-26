@@ -9,7 +9,7 @@ import os
 
 # --- Configuration Updated ---
 IMG_SIZE = 224
-BATCH_SIZE = 100
+BATCH_SIZE = 99
 # Increased epochs to 100 as per teacher's requirement
 EPOCHS = 100 
 train_dir = os.path.join("..", "data", "train")
