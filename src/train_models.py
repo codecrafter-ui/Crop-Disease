@@ -9,7 +9,7 @@ import os
 
 # --- Configuration Updated ---
 IMG_SIZE = 224
-BATCH_SIZE = 99
+BATCH_SIZE = 65
 # Increased epochs to 100 as per teacher's requirement
 EPOCHS = 30
 train_dir = os.path.join("..", "data", "train")
@@ -19,18 +19,10 @@ os.makedirs(model_save_dir, exist_ok=True)
 num_classes = len(os.listdir(train_dir))
 print(f"Detected {num_classes} classes for training.")
 
-# --- Data Generators ---
+# --- Data Generators (AUGMENTATION REMOVED) ---
 train_gen = ImageDataGenerator(
     rescale=1./255, 
-    # CHANGED: validation_split is now 0.20 (20%) for an 80/20 split
-    validation_split=0.20,
-    rotation_range=20,
-    width_shift_range=0.2,
-    height_shift_range=0.2,
-    shear_range=0.2,
-    zoom_range=0.2,
-    horizontal_flip=True,
-    fill_mode='nearest'
+    validation_split=0.30 
 )
 
 train_data = train_gen.flow_from_directory(

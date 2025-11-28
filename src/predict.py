@@ -1,4 +1,3 @@
-# Updated imports for Keras 3 compatibility
 import keras
 from keras.preprocessing import image
 import numpy as np
@@ -15,7 +14,6 @@ regressor_path = os.path.join("..", "models", "rf_regressor.joblib")
 train_dir = os.path.join("..", "data", "train")
 
 try:
-    # Use keras.models.load_model
     classifier_model = keras.models.load_model(classifier_path)
     regressor_model = joblib.load(regressor_path)
     
@@ -52,16 +50,28 @@ def predict_disease_and_yield(img_path):
     else:
         severity_score = 0.85 
         
+    # UPDATED: Initialize ALL crop columns used in synthetic data/regressor training
     input_data = {
         'Severity_Score': [severity_score],
+        'Crop_Type_Pepper': [0],
         'Crop_Type_Potato': [0],
         'Crop_Type_Tomato': [0],
+        'Crop_Type_Apple': [0],
+        'Crop_Type_Coffee': [0],
     }
     
+    # Set the correct flag to 1 based on the classified disease name
     if 'Potato' in predicted_disease:
         input_data['Crop_Type_Potato'] = [1]
     elif 'Tomato' in predicted_disease:
         input_data['Crop_Type_Tomato'] = [1]
+    elif 'Pepper' in predicted_disease:
+        input_data['Crop_Type_Pepper'] = [1]
+    elif 'Apple' in predicted_disease:
+        input_data['Crop_Type_Apple'] = [1]
+    elif 'Coffee' in predicted_disease:
+        input_data['Crop_Type_Coffee'] = [1]
+
 
     regressor_input = pd.DataFrame(input_data)
 
