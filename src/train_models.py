@@ -22,7 +22,8 @@ print(f"Detected {num_classes} classes for training.")
 # --- Data Generators ---
 train_gen = ImageDataGenerator(
     rescale=1./255, 
-    validation_split=0.15,
+    # CHANGED: validation_split is now 0.20 (20%) for an 80/20 split
+    validation_split=0.20,
     rotation_range=20,
     width_shift_range=0.2,
     height_shift_range=0.2,
