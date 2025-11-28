@@ -11,7 +11,7 @@ import os
 IMG_SIZE = 224
 BATCH_SIZE = 99
 # Increased epochs to 100 as per teacher's requirement
-EPOCHS = 100 
+EPOCHS = 30
 train_dir = os.path.join("..", "data", "train")
 model_save_dir = os.path.join("..", "models")
 os.makedirs(model_save_dir, exist_ok=True)
