@@ -3,12 +3,11 @@ from keras.preprocessing import image
 import numpy as np
 import os
 import joblib
-import pandas as pd 
+import pandas as pd
 
-CLASSIFIER_NAME = "ResNet50" 
-IMG_SIZE = 224 
+CLASSIFIER_NAME = "ResNet50"
+IMG_SIZE = 224
 
-# Paths
 classifier_path = os.path.join("..", "models", f"{CLASSIFIER_NAME}_best.h5")
 regressor_path = os.path.join("..", "models", "rf_regressor.joblib")
 train_dir = os.path.join("..", "data", "train")
@@ -16,9 +15,7 @@ train_dir = os.path.join("..", "data", "train")
 try:
     classifier_model = keras.models.load_model(classifier_path)
     regressor_model = joblib.load(regressor_path)
-    
     class_names = sorted(os.listdir(train_dir))
-    
 except Exception as e:
     print(f"Error loading models: {e}")
     print("Ensure all models are trained and present in the '../models' folder.")
@@ -36,21 +33,20 @@ def predict_disease_and_yield(img_path):
     pred_probabilities = classifier_model.predict(img_array)[0]
     class_index = np.argmax(pred_probabilities)
     confidence = np.max(pred_probabilities)
-    
+
     predicted_disease = class_names[class_index]
-    
+
     print("\n--- CLASSIFICATION RESULTS ---")
     print(f"Predicted Class: {predicted_disease}")
     print(f"Confidence: {confidence * 100:.2f}%")
-    
+
     if "healthy" in predicted_disease.lower():
-        severity_score = 0.1 
+        severity_score = 0.1
     elif confidence > 0.8:
-        severity_score = 0.65 
+        severity_score = 0.65
     else:
-        severity_score = 0.85 
-        
-    # UPDATED: Initialize ALL crop columns used in synthetic data/regressor training
+        severity_score = 0.85
+
     input_data = {
         'Severity_Score': [severity_score],
         'Crop_Type_Pepper': [0],
@@ -59,8 +55,7 @@ def predict_disease_and_yield(img_path):
         'Crop_Type_Apple': [0],
         'Crop_Type_Coffee': [0],
     }
-    
-    # Set the correct flag to 1 based on the classified disease name
+
     if 'Potato' in predicted_disease:
         input_data['Crop_Type_Potato'] = [1]
     elif 'Tomato' in predicted_disease:
@@ -72,11 +67,9 @@ def predict_disease_and_yield(img_path):
     elif 'Coffee' in predicted_disease:
         input_data['Crop_Type_Coffee'] = [1]
 
-
     regressor_input = pd.DataFrame(input_data)
-
     yield_loss_prediction = regressor_model.predict(regressor_input)[0]
-    
+
     print("\n--- REGRESSION RESULTS ---")
     print(f"Input Severity Score (Simulated): {severity_score:.2f}")
     print(f"Predicted Yield Loss: {yield_loss_prediction:.2f}%")
@@ -85,8 +78,7 @@ def predict_disease_and_yield(img_path):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
-        print("Usage: python predict.py <path_to_leaf_image>")
+        print("Usage: python predict.py ..data/raw_data/Apple_Extracted/data/healthy/Train_18.jpg")
         print("Example: python predict.py ../data/test/Tomato_Bacterial_spot/1.JPG")
-        
     else:
         predict_disease_and_yield(sys.argv[1])

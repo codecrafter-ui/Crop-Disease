@@ -8,22 +8,23 @@ import joblib
 
 data_path = os.path.join("..", "data", "yield_regression_data.csv")
 model_path = os.path.join("..", "models", "rf_regressor.joblib")
+
 os.makedirs(os.path.join("..", "models"), exist_ok=True)
 
 def generate_synthetic_data(num_samples=100):
     data = {
-        'Severity_Score': np.random.uniform(0.1, 0.9, num_samples), 
+        'Severity_Score': np.random.uniform(0.1, 0.9, num_samples),
         'Crop_Type': np.random.choice(['Tomato', 'Pepper', 'Potato'], num_samples),
         'Yield_Loss_Percentage': (data['Severity_Score'] * 50) + np.random.normal(0, 5, num_samples)
     }
     df = pd.DataFrame(data)
-    df['Yield_Loss_Percentage'] = np.clip(df['Yield_Loss_Percentage'], 0, 80) 
+    df['Yield_Loss_Percentage'] = np.clip(df['Yield_Loss_Percentage'], 0, 80)
     return df
 
 try:
     df = pd.read_csv(data_path)
     if 'Severity_Score' not in df.columns or len(df) <= 1:
-        raise FileNotFoundError 
+        raise FileNotFoundError
 except (FileNotFoundError, pd.errors.EmptyDataError, KeyError):
     print("Generating synthetic data for the Regression model. REPLACE THIS LATER.")
     df = generate_synthetic_data(num_samples=200)
