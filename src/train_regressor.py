@@ -12,27 +12,37 @@ model_path = os.path.join("..", "models", "rf_regressor.joblib")
 os.makedirs(os.path.join("..", "models"), exist_ok=True)
 
 def generate_synthetic_data(num_samples=100):
+    severity_scores = np.random.uniform(0.1, 0.9, num_samples)
+    
+    yield_loss = (severity_scores * 50) + np.random.normal(0, 5, num_samples)
     data = {
-        'Severity_Score': np.random.uniform(0.1, 0.9, num_samples),
-        'Crop_Type': np.random.choice(['Tomato', 'Pepper', 'Potato'], num_samples),
-        'Yield_Loss_Percentage': (data['Severity_Score'] * 50) + np.random.normal(0, 5, num_samples)
+        'Severity_Score': severity_scores,
+        'Crop_Type': np.random.choice(['Tomato', 'Pepper', 'Potato', 'Apple', 'Coffee'], num_samples),
+        'Yield_Loss_Percentage': yield_loss
     }
+    
     df = pd.DataFrame(data)
-    df['Yield_Loss_Percentage'] = np.clip(df['Yield_Loss_Percentage'], 0, 80)
+    df['Yield_Loss_Percentage'] = np.clip(df['Yield_Loss_Percentage'], 0, 100)
     return df
 
 try:
     df = pd.read_csv(data_path)
     if 'Severity_Score' not in df.columns or len(df) <= 1:
-        raise FileNotFoundError
+        raise FileNotFoundError 
 except (FileNotFoundError, pd.errors.EmptyDataError, KeyError):
-    print("Generating synthetic data for the Regression model. REPLACE THIS LATER.")
-    df = generate_synthetic_data(num_samples=200)
+    print("Generating synthetic data for the Regression model (Placeholder).")
+    df = generate_synthetic_data(num_samples=500)
 
-df_processed = pd.get_dummies(df, columns=['Crop_Type'], drop_first=True)
+df_processed = pd.get_dummies(df, columns=['Crop_Type'], drop_first=False) 
+expected_crops = ['Crop_Type_Apple', 'Crop_Type_Coffee', 'Crop_Type_Pepper', 'Crop_Type_Potato', 'Crop_Type_Tomato']
+for col in expected_crops:
+    if col not in df_processed.columns:
+        df_processed[col] = 0
 
 X = df_processed.drop('Yield_Loss_Percentage', axis=1)
 y = df_processed['Yield_Loss_Percentage']
+
+X = X[['Severity_Score'] + expected_crops]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
