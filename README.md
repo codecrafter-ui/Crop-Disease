@@ -77,7 +77,7 @@ To verify the classification results used in Section 6.1 of the report:
     - Navigate: 
         cd src
     - Run Evaluation: (Enter DenseNet121 when prompted)
-            python evaluate_clf.py
+        python evaluate_clf.py
     (This generates the Confusion Matrix image: figures/cm_DenseNet121.png)
 
 Final Regression Metrics
